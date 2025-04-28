@@ -1,0 +1,1 @@
+C:\ChristmasTreeApp\ChristmasTreeApp\build\app\intermediates\cxx\Debug\65534t60\obj\arm64-v8a

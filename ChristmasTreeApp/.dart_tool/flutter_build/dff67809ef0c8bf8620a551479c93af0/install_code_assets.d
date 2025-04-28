@@ -1,0 +1,1 @@
+ C:\\ChristmasTreeApp\\ChristmasTreeApp\\.dart_tool\\flutter_build\\dff67809ef0c8bf8620a551479c93af0\\native_assets.json: 

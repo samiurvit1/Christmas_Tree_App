@@ -1,0 +1,2 @@
+C:/ChristmasTreeApp/ChristmasTreeApp/android/app/.cxx/Debug/65534t60/x86_64/CMakeFiles/edit_cache.dir
+C:/ChristmasTreeApp/ChristmasTreeApp/android/app/.cxx/Debug/65534t60/x86_64/CMakeFiles/rebuild_cache.dir
