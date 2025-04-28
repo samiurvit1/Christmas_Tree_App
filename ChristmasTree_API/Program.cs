@@ -2,6 +2,8 @@ using ChristmasTreeApp.Data;
 using ChristmasTreeApp.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Net;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,17 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Christmas Decor API", Version = "v1" });
 });
-builder.WebHost.UseUrls("http://192.168.1.122:5192"); // Listen on all interfaces
+
+// Get the local IP address dynamically
+var host = Dns.GetHostEntry(Dns.GetHostName());
+var ipAddress = host.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+
+// Fallback to localhost if no network IP is found
+var url = ipAddress != null ? $"http://{ipAddress}:5192" : "http://localhost:5192";
+
+builder.WebHost.UseUrls(url);
+
+//builder.WebHost.UseUrls("http://172.20.10.2:5192"); // Listen on all interfaces
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
