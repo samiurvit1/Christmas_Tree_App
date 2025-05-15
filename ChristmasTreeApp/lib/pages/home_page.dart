@@ -28,10 +28,64 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   double _santaPosition = -100; // Initial position of Santa (off-screen)
   late Timer _timer;
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  static final AudioPlayer _audioPlayer = AudioPlayer(); // Make static
+  bool _isPlaying = true; // Track play state
   final ApiService _apiService = ApiService(); // Instance of ApiService
   List<Product> _featuredProducts = []; // Initialize as an empty list
   List<Category> _categories = [];
+
+  // Add language state and translations
+  String _language = 'en';
+  final Map<String, Map<String, String>> _localizedStrings = {
+    'en': {
+      'christmas_decor': 'Christmas Decor',
+      'home': 'Home',
+      'shop': 'Shop',
+      'design': 'Design',
+      'profile': 'Profile',
+      'categories': 'Categories',
+      'featured_products': 'Featured Products',
+      'refer_a_friend': 'Refer a Friend',
+      'share_spirit': 'Share the Christmas Spirit',
+      'customize_tree': 'Customize Your Christmas Tree',
+      'start_designing': 'Start Designing',
+      'need_stylist': 'Need Help from a Stylist?',
+      'book_stylist': 'Book a Stylist',
+      'pause_music': 'Pause Christmas Music',
+      'play_music': 'Play Christmas Music',
+      'sign_out': 'Sign Out',
+      'language': 'Español',
+      'design_tree': 'Design Your Dream Tree',
+    },
+    'es': {
+      'christmas_decor': 'Decoración Navideña',
+      'home': 'Inicio',
+      'shop': 'Tienda',
+      'design': 'Diseño',
+      'profile': 'Perfil',
+      'categories': 'Categorías',
+      'featured_products': 'Productos Destacados',
+      'refer_a_friend': 'Recomienda a un Amigo',
+      'share_spirit': 'Comparte el Espíritu Navideño',
+      'customize_tree': 'Personaliza tu Árbol de Navidad',
+      'start_designing': 'Comenzar a Diseñar',
+      'need_stylist': '¿Necesitas ayuda de un estilista?',
+      'book_stylist': 'Reservar un Estilista',
+      'pause_music': 'Pausar Música Navideña',
+      'play_music': 'Reproducir Música Navideña',
+      'sign_out': 'Cerrar Sesión',
+      'language': 'English',
+      'design_tree': 'Diseña tu Árbol Soñado',
+    }
+  };
+
+  String t(String key) => _localizedStrings[_language]![key] ?? key;
+
+  void _toggleLanguage() {
+    setState(() {
+      _language = _language == 'en' ? 'es' : 'en';
+    });
+  }
 
   @override
   void initState() {
@@ -40,11 +94,15 @@ class _HomePageState extends State<HomePage> {
     _startSantaAnimation();
     _fetchFeaturedProducts(); // Fetch featured products
     _fetchCategories();
+    _audioPlayer.playerStateStream.listen((state) {
+      setState(() {
+        _isPlaying = state.playing;
+      });
+    });
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose(); // Dispose of the audio player
     _timer.cancel(); // Cancel the timer when the widget is disposed
     super.dispose();
   }
@@ -61,15 +119,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _playChristmasSound() async {
-  try {
-    print('Loading sound asset...');
-    await _audioPlayer.setAsset('assets/sounds/christmas_jingle.mp3'); // Load the sound
-    print('Playing sound...');
-    _audioPlayer.play(); // Play the sound
-  } catch (e) {
-    print('Error playing sound: $e'); // Log any errors
+    try {
+      await _audioPlayer.setAsset('assets/sounds/christmas_jingle.mp3');
+      _audioPlayer.setLoopMode(LoopMode.one); // Loop the sound
+      _audioPlayer.play();
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
-}
+
+  void _toggleMusic() async {
+    if (_isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.play();
+    }
+  }
 
   void _fetchFeaturedProducts() async {
     try {
@@ -98,9 +163,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Christmas Decor',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          t('christmas_decor'),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFFD62828), // Festive Red
         actions: [
@@ -137,22 +202,22 @@ class _HomePageState extends State<HomePage> {
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
           elevation: 0, // Using Container's shadow instead
           type: BottomNavigationBarType.fixed,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: const Icon(Icons.home),
+              label: t('home'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag),
-              label: 'Shop',
+              icon: const Icon(Icons.shopping_bag),
+              label: t('shop'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.design_services),
-              label: 'Design',
+              icon: const Icon(Icons.design_services),
+              label: t('design'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
+              icon: const Icon(Icons.person),
+              label: t('profile'),
             ),
           ],
         ),
@@ -218,8 +283,8 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 child: Text(
-                  'Design Your Dream Tree',
-                  style: TextStyle(
+                  t('design_tree'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -250,9 +315,9 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Categories',
-                style: TextStyle(
+              Text(
+                t('categories'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFFD62828), // Festive Red
@@ -262,7 +327,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
               height: 100,
               child: _categories.isEmpty 
-                  ? Center(child: CircularProgressIndicator()) // or show loading
+                  ? const Center(child: CircularProgressIndicator()) // or show loading
                   : ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: _categories.length,
@@ -282,9 +347,9 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Featured Products',
-                style: TextStyle(
+              Text(
+                t('featured_products'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF007F5F), // Festive Green
@@ -315,9 +380,9 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Refer a Friend',
-                style: TextStyle(
+              Text(
+                t('refer_a_friend'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFFD62828), // Festive Red
@@ -332,7 +397,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 icon: const Icon(Icons.card_giftcard),
-                label: const Text('Share the Christmas Spirit'),
+                label: Text(t('share_spirit')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD62828), // Festive Red
                   foregroundColor: Colors.white,
@@ -498,14 +563,44 @@ IconData getCupertinoIcon(String iconName) {
             style: const TextStyle(fontSize: 18),
           ),
           const SizedBox(height: 16),
+          // Music Play/Pause Button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: ElevatedButton.icon(
+              icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+              label: Text(_isPlaying ? t('pause_music') : t('play_music')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFD62828),
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: _toggleMusic,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Language Change Button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.language),
+              label: Text(t('language')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF007F5F),
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: _toggleLanguage,
+            ),
+          ),
+          const SizedBox(height: 16),
           // Refer a Friend Button
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.card_giftcard),
-              label: const Text('Refer a Friend'),
+              label: Text(t('refer_a_friend')),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD62828), // Festive Red
+                backgroundColor: const Color(0xFFD62828),
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 50),
               ),
@@ -524,14 +619,14 @@ IconData getCupertinoIcon(String iconName) {
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F5F), // Festive Green
+                backgroundColor: const Color(0xFF007F5F),
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 50),
               ),
               onPressed: () {
                 // Logout logic
               },
-              child: const Text('Sign Out'),
+              child: Text(t('sign_out')),
             ),
           ),
         ],

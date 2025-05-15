@@ -54,11 +54,11 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
   final List<String> sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
   final List<String> colors = ['Green', 'White', 'Black', 'Pink', 'Gold'];
   final List<String> ornaments = [
-    'Glass Baubles',
-    'Personalized',
-    'Themed Sets',
-    'DIY Paintable',
-    'Hanging Figurines'
+    'Red',
+    'Blue',
+    'Gold',
+    'Green',
+    'Silver',
   ];
   final List<String> lights = [
     'LED String',
@@ -151,79 +151,68 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
 
   Widget _buildTreePreview() {
     final treeSize = _getTreeSize();
-    final treeCenterX = MediaQuery.of(context).size.width / 2 - treeSize / 2;
-    final treeTopY = 50.0; // Top margin for the tree
+    // Make the container at least 1.3x the tree size plus extra for topper
+    final containerHeight = treeSize * 1.3 + 40;
 
     return Container(
-      height: 300,
+      height: containerHeight,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: _getBackgroundGradient(selectedColor),
+        ),
       ),
       child: Stack(
         children: [
-          // Tree Base
-          Positioned(
-            left: treeCenterX,
-            top: treeTopY,
-            child: Icon(
-              Icons.park,
-              size: treeSize,
-              color: _getTreeColor(),
+          // Tree Image (centered)
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: EdgeInsets.only(top: 40.0), // less padding so tree fits
+              child: Image.asset(
+                'assets/images/tree.png',
+                width: treeSize,
+                height: treeSize,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
 
-          // Lights Effect
-          if (selectedLights.isNotEmpty) ...[
-            Positioned(
-              left: treeCenterX,
-              top: treeTopY,
-              child: Container(
-                width: treeSize,
-                height: treeSize,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      _getLightsColor().withOpacity(0.2),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.1, 0.9],
+          // Lights Effect (optional)
+          if (selectedLights.isNotEmpty)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment.topCenter,
+                      radius: 1.0,
+                      colors: [
+                        _getLightsColor().withOpacity(0.25), // softer, more natural
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
                   ),
                 ),
               ),
             ),
-            ...List.generate(20, (index) {
-              return Positioned(
-                left: treeCenterX + _random.nextDouble() * treeSize,
-                top: treeTopY + _random.nextDouble() * treeSize,
-                child: Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: _getLightsColor(),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: _getLightsColor(),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ],
 
-          // Tree Topper
+          // Tree Topper as image
           if (selectedTreeTopper.isNotEmpty)
-            Positioned(
-              left: treeCenterX + treeSize / 2 - 20,
-              top: treeTopY - 40, // Adjusted to place the topper above the tree
-              child: Icon(
-                _getTopperIcon(),
-                size: 40,
-                color: _getTopperColor(),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: 40.0 - 20, // 40 is the tree's top padding, 20 is half topper height
+                ),
+                child: Image.asset(
+                  _getTopperImage(selectedTreeTopper),
+                  width: 40,
+                  height: 40,
+                ),
               ),
             ),
 
@@ -247,7 +236,7 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
             ),
           ),
 
-          // Placed Ornaments
+          // Placed Ornaments as images
           ...placedOrnaments.map((ornament) {
             return Positioned(
               left: ornament.position.dx - 15,
@@ -294,26 +283,48 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
     );
   }
 
+  // Use images for ornament icons
   Widget _buildOrnamentIcon(String type, {double size = 30}) {
-    return Container(
+    return Image.asset(
+      _getOrnamentImage(type),
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: _getOrnamentColor(type),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.black, width: 1),
-      ),
-      child: Center(
-        child: Text(
-          type[0], // First letter of ornament type
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: size * 0.4,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      fit: BoxFit.contain,
     );
+  }
+
+  // Helper to get ornament image path
+  String _getOrnamentImage(String type) {
+    switch (type) {
+      case 'Red':
+        return 'assets/images/ornament_red.png';
+      case 'Blue':
+        return 'assets/images/ornament_blue.png';
+      case 'Gold':
+        return 'assets/images/ornament_gold.png';
+      case 'Green':
+        return 'assets/images/ornament_green.png';
+      case 'Silver':
+        return 'assets/images/ornament_silver.png';
+      default:
+        return 'assets/images/ornament_red.png';
+    }
+  }
+
+  // Helper to get topper image path
+  String _getTopperImage(String type) {
+    switch (type) {
+      case 'Star':
+        return 'assets/images/topper_star.png';
+      case 'Angel':
+        return 'assets/images/topper_angel.png';
+      case 'Bow':
+        return 'assets/images/topper_bow.png';
+      case 'Snowflake':
+        return 'assets/images/topper_snowflake.png';
+      default:
+        return 'assets/images/topper_star.png';
+    }
   }
 
   Widget _buildActionButtons() {
@@ -373,23 +384,32 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
     bool isColor = false,
   }) {
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 6,
+      runSpacing: 6,
       children: options.map((option) {
         return ChoiceChip(
           label: isColor
               ? Container(
-                  width: 24,
-                  height: 24,
-                  color: _getColorFromName(option),
+                  width: 18, // smaller
+                  height: 18, // smaller
+                  decoration: BoxDecoration(
+                    color: _getColorFromName(option),
+                    shape: BoxShape.circle,
+                  ),
                 )
-              : Text(option),
+              : Text(
+                  option,
+                  style: const TextStyle(fontSize: 12), // smaller font
+                ),
           selected: selected == option,
           onSelected: (selected) => onSelected(option),
           selectedColor: Colors.green[100],
           labelStyle: TextStyle(
             color: selected == option ? Colors.black : null,
+            fontSize: 12, // smaller font
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), // smaller padding
+          visualDensity: VisualDensity.compact, // more compact
         );
       }).toList(),
     );
@@ -401,31 +421,38 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
     required Function(String) onSelected,
   }) {
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 6,
+      runSpacing: 6,
       children: options.map((option) {
         return ChoiceChip(
-          label: Text(option),
+          label: Text(
+            option,
+            style: const TextStyle(fontSize: 12), // smaller font
+          ),
           selected: selected.contains(option),
           onSelected: (selected) => onSelected(option),
           selectedColor: Colors.green[100],
           labelStyle: TextStyle(
             color: selected.contains(option) ? Colors.black : null,
+            fontSize: 12, // smaller font
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), // smaller padding
+          visualDensity: VisualDensity.compact, // more compact
         );
       }).toList(),
     );
   }
 
   double _getTreeSize() {
-    switch (selectedSize) {
-      case 'Small': return 120;
-      case 'Medium': return 160;
-      case 'Large': return 200;
-      case 'Extra Large': return 240;
-      default: return 160;
-    }
+  final maxWidth = MediaQuery.of(context).size.width * 0.8;
+  switch (selectedSize) {
+    case 'Small': return min(120, maxWidth);
+    case 'Medium': return min(160, maxWidth);
+    case 'Large': return min(200, maxWidth);
+    case 'Extra Large': return min(260, maxWidth); // increased for XL
+    default: return min(160, maxWidth);
   }
+}
 
   Color _getTreeColor() {
     switch (selectedColor) {
@@ -489,6 +516,23 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
       case 'Pink': return Colors.pink;
       case 'Gold': return Colors.yellow[700]!;
       default: return Colors.green;
+    }
+  }
+
+  List<Color> _getBackgroundGradient(String color) {
+    switch (color) {
+      case 'Green':
+        return [Color(0xFFD7263D), Color(0xFFF46036)];
+      case 'White':
+        return [Color(0xFFE0E0E0), Color(0xFFFFFFFF)];
+      case 'Black':
+        return [Color(0xFF232526), Color(0xFF414345)];
+      case 'Pink':
+        return [Color(0xFFFF5F6D), Color(0xFFFFC371)];
+      case 'Gold':
+        return [Color(0xFFFFD700), Color(0xFFFFE066)];
+      default:
+        return [Color(0xFFD7263D), Color(0xFFF46036)];
     }
   }
 

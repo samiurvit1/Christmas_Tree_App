@@ -78,6 +78,16 @@ flutter:
     - assets/models/
     - assets/models/25k_followers_christmas_special.glb
     - assets/images/santa.png
+    - assets/images/tree.png
+    - assets/images/ornament_red.png
+    - assets/images/ornament_blue.png
+    - assets/images/ornament_gold.png
+    - assets/images/ornament_green.png
+    - assets/images/ornament_silver.png
+    - assets/images/topper_star.png
+    - assets/images/topper_angel.png
+    - assets/images/topper_bow.png
+    - assets/images/topper_snowflake.png
     - assets/sounds/christmas_jingle.mp3
 
   # To add assets to your application, add an assets section, like this:
