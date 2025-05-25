@@ -166,16 +166,21 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
       ),
       child: Stack(
         children: [
-          // Tree Image (centered)
+          // Tree Image (centered and zoomable)
           Align(
             alignment: Alignment.topCenter,
             child: Padding(
               padding: EdgeInsets.only(top: 40.0), // less padding so tree fits
-              child: Image.asset(
-                'assets/images/tree.png',
-                width: treeSize,
-                height: treeSize,
-                fit: BoxFit.contain,
+              child: InteractiveViewer(
+                panEnabled: true, // Enable panning
+                minScale: 0.5,    // Minimum scale factor
+                maxScale: 4.0,    // Maximum scale factor
+                child: Image.asset(
+                  'assets/images/tree.png',
+                  width: treeSize,
+                  height: treeSize,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),

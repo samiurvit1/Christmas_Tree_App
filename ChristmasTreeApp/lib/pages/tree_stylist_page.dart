@@ -1,5 +1,7 @@
 // lib/pages/tree_stylist_page.dart
 import 'package:flutter/material.dart';
+// Assuming you might have an OrderConfirmationPage or similar for checkout
+// import 'package:christmas_tree/pages/order_confirmation_page.dart';
 
 class TreeStylistPage extends StatefulWidget {
   const TreeStylistPage({super.key});
@@ -9,60 +11,29 @@ class TreeStylistPage extends StatefulWidget {
 }
 
 class _TreeStylistPageState extends State<TreeStylistPage> {
-  int? selectedStylistId;
+  String? selectedServiceType; // 'Drop-off' or 'Pick-up'
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
-  final List<Map<String, dynamic>> stylists = [
-    {
-      'id': 1,
-      'name': 'Emma Johnson',
-      'rating': 4.8,
-      'image': 'https://randomuser.me/api/portraits/women/43.jpg',
-      'rate': 50,
-      'bio': 'Specializes in traditional Christmas themes with a modern twist.'
-    },
-    {
-      'id': 2,
-      'name': 'Michael Chen',
-      'rating': 4.9,
-      'image': 'https://randomuser.me/api/portraits/men/32.jpg',
-      'rate': 65,
-      'bio': 'Expert in minimalist and Scandinavian Christmas designs.'
-    },
-    {
-      'id': 3,
-      'name': 'Sophia Rodriguez',
-      'rating': 4.7,
-      'image': 'https://randomuser.me/api/portraits/women/65.jpg',
-      'rate': 55,
-      'bio': 'Creates magical winter wonderland themed trees.'
-    },
-  ];
+  final List<String> serviceTypes = ['Drop-off', 'Pick-up'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book a Tree Stylist'),
+        title: const Text('Schedule Service'), // Updated title
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Select a Stylist',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ...stylists.map((stylist) => _buildStylistCard(stylist)).toList(),
+            _buildServiceTypeSelection(),
             const SizedBox(height: 20),
-            if (selectedStylistId != null) _buildDateTimeSelection(),
-            if (selectedStylistId != null && selectedDate != null && selectedTime != null)
+            if (selectedServiceType != null) _buildDateTimeSelection(),
+            if (selectedServiceType != null &&
+                selectedDate != null &&
+                selectedTime != null)
               _buildBookingSummary(),
           ],
         ),
@@ -70,96 +41,63 @@ class _TreeStylistPageState extends State<TreeStylistPage> {
     );
   }
 
-  Widget _buildStylistCard(Map<String, dynamic> stylist) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            selectedStylistId = stylist['id'];
-            selectedDate = null;
-            selectedTime = null;
-          });
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(stylist['image']),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      stylist['name'],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.yellow[700], size: 16),
-                        Text(
-                          ' ${stylist['rating']}',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '\$${stylist['rate']}/hour',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      stylist['bio'],
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    if (selectedStylistId == stylist['id'])
-                      Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.green[50],
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.green),
-                        ),
-                        child: const Text(
-                          'Selected',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateTimeSelection() {
+  Widget _buildServiceTypeSelection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Select Date & Time',
+          'Select Service Type',
           style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8.0,
+          children: serviceTypes.map((type) {
+            return ChoiceChip(
+              label: Text(type),
+              selected: selectedServiceType == type,
+              onSelected: (isSelected) {
+                setState(() {
+                  if (isSelected) {
+                    selectedServiceType = type;
+                    // Reset date and time when service type changes
+                    selectedDate = null;
+                    selectedTime = null;
+                  } else {
+                    // Optional: allow deselecting, though typically one is always chosen
+                    // selectedServiceType = null;
+                  }
+                });
+              },
+              selectedColor: Colors.green[100],
+              labelStyle: TextStyle(
+                color: selectedServiceType == type ? Colors.green[700] : Colors.black,
+                fontWeight: selectedServiceType == type ? FontWeight.bold : FontWeight.normal,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateTimeSelection() {
+    String dateButtonText = selectedDate == null
+        ? 'Select ${selectedServiceType ?? ""} Date'
+        : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}';
+    String timeButtonText = selectedTime == null
+        ? 'Select ${selectedServiceType ?? ""} Time'
+        : selectedTime!.format(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Select ${selectedServiceType ?? ""} Date & Time',
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -176,24 +114,22 @@ class _TreeStylistPageState extends State<TreeStylistPage> {
                 onPressed: () async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: selectedDate ?? DateTime.now(),
                     firstDate: DateTime.now(),
-                    lastDate: DateTime(DateTime.now().year, 12, 31),
+                    lastDate: DateTime(DateTime.now().year + 1, 12, 31), // Allow booking into next year
                   );
                   if (picked != null) {
                     setState(() {
                       selectedDate = picked;
-                      selectedTime = null;
+                      selectedTime = null; // Reset time when date changes
                     });
                   }
                 },
                 child: Text(
-                  selectedDate == null
-                      ? 'Select Date'
-                      : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                  dateButtonText,
                   style: TextStyle(
                     fontSize: 16,
-                    color: selectedDate == null ? Colors.grey : Colors.black,
+                    color: selectedDate == null ? Colors.grey[700] : Colors.black,
                   ),
                 ),
               ),
@@ -206,23 +142,21 @@ class _TreeStylistPageState extends State<TreeStylistPage> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: selectedDate == null
-                    ? null
+                    ? null // Disable if date not selected
                     : () async {
                         final TimeOfDay? picked = await showTimePicker(
                           context: context,
-                          initialTime: TimeOfDay(hour: 10, minute: 0),
+                          initialTime: selectedTime ?? TimeOfDay(hour: 10, minute: 0),
                         );
                         if (picked != null) {
                           setState(() => selectedTime = picked);
                         }
                       },
                 child: Text(
-                  selectedTime == null
-                      ? 'Select Time'
-                      : selectedTime!.format(context),
+                  timeButtonText,
                   style: TextStyle(
                     fontSize: 16,
-                    color: selectedTime == null ? Colors.grey : Colors.black,
+                    color: selectedTime == null ? Colors.grey[700] : Colors.black,
                   ),
                 ),
               ),
@@ -234,10 +168,6 @@ class _TreeStylistPageState extends State<TreeStylistPage> {
   }
 
   Widget _buildBookingSummary() {
-    final selectedStylist = stylists.firstWhere(
-      (s) => s['id'] == selectedStylistId,
-    );
-
     return Container(
       margin: const EdgeInsets.only(top: 20),
       padding: const EdgeInsets.all(16),
@@ -256,42 +186,21 @@ class _TreeStylistPageState extends State<TreeStylistPage> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundImage: NetworkImage(selectedStylist['image']),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    selectedStylist['name'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '\$${selectedStylist['rate']}/hour',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Text(
-            'Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+            'Service Type: ${selectedServiceType ?? "N/A"}',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Date: ${selectedDate != null ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}" : "N/A"}',
             style: const TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 8),
           Text(
-            'Time: ${selectedTime!.format(context)}',
+            'Time: ${selectedTime != null ? selectedTime!.format(context) : "N/A"}',
             style: const TextStyle(fontSize: 16),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -300,10 +209,19 @@ class _TreeStylistPageState extends State<TreeStylistPage> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               onPressed: () {
-                // Proceed to checkout
+                // Proceed to checkout or confirmation
+                // You would typically pass the selectedServiceType, selectedDate, and selectedTime
+                // to the next page or a booking service.
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Proceeding with ${selectedServiceType ?? ""} for ${selectedDate!.day}/${selectedDate!.month} at ${selectedTime!.format(context)}'),
+                  ),
+                );
+                // Example: Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(serviceType: selectedServiceType!, date: selectedDate!, time: selectedTime!)));
               },
               child: const Text(
-                'Continue to Checkout',
+                'Confirm Booking', // Updated button text
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.white,
