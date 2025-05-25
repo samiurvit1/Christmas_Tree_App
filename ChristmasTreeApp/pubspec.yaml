@@ -48,6 +48,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   just_audio: ^0.9.30
+  video_player: ^2.8.2
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +79,7 @@ flutter:
     - assets/models/
     - assets/models/25k_followers_christmas_special.glb
     - assets/images/santa.png
+    - assets/images/banner.jpg
     - assets/images/tree.png
     - assets/images/ornament_red.png
     - assets/images/ornament_blue.png
@@ -89,6 +91,7 @@ flutter:
     - assets/images/topper_bow.png
     - assets/images/topper_snowflake.png
     - assets/sounds/christmas_jingle.mp3
+    - assets/videos/video.mp4
 
   # To add assets to your application, add an assets section, like this:
   # assets:

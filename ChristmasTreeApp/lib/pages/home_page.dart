@@ -14,9 +14,9 @@ import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:christmas_tree/pages/checkout_page.dart';
 import 'package:christmas_tree/pages/cart_page.dart';
-
+import 'package:video_player/video_player.dart';
 import '../models/category.dart';
-// import '../services/api_service.dart'; // Import your ApiService
+// import '../services/api_service.dart'; 
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   double _santaPosition = -100; // Initial position of Santa (off-screen)
   late Timer _timer;
   static final AudioPlayer _audioPlayer = AudioPlayer(); // Make static
+  late VideoPlayerController _videoController;
   bool _isPlaying = true; // Track play state
   final ApiService _apiService = ApiService(); // Instance of ApiService
   List<Product> _featuredProducts = []; // Initialize as an empty list
@@ -102,11 +103,22 @@ class _HomePageState extends State<HomePage> {
         _isPlaying = state.playing;
       });
     });
+    _videoController = VideoPlayerController.asset('assets/videos/video.mp4');
+    _videoController.initialize().then((_) {
+      print('Video initialized: ${_videoController.value.isInitialized}');
+      setState(() {});
+      _videoController.setLooping(true);
+      _videoController.play();
+    });
+    _videoController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _timer.cancel(); // Cancel the timer when the widget is disposed
+      _videoController.dispose(); // Don't forget to dispose the controller
     super.dispose();
   }
 
@@ -256,15 +268,12 @@ class _HomePageState extends State<HomePage> {
             // Gradient container
             Container(
               height: 200,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFD62828), // Festive Red
-                    Color(0xFF007F5F), // Festive Green
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/banner.jpg'), // <-- your banner image
+                  fit: BoxFit.cover,
                 ),
+                borderRadius: BorderRadius.circular(0), // or 16 if you want rounded corners
               ),
             ),
             // Snowfall animation
@@ -279,28 +288,28 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             // Centered text
-            Positioned.fill(
-            child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CustomizeTreePage()),
-                  );
-                },
-                child: Text(
-                  t('design_tree'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          ),
+          //   Positioned.fill(
+          //   child: Center(
+          //     child: GestureDetector(
+          //       onTap: () {
+          //         Navigator.push(
+          //           context,
+          //           MaterialPageRoute(builder: (context) => CustomizeTreePage()),
+          //         );
+          //       },
+          //       child: Text(
+          //         t('design_tree'),
+          //         style: const TextStyle(
+          //           color: Colors.white,
+          //           fontSize: 24,
+          //           fontWeight: FontWeight.bold,
+          //           fontFamily: 'Poppins',
+          //         ),
+          //         textAlign: TextAlign.center,
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
             // Santa passing by animation
             Positioned(
@@ -342,11 +351,20 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
             ),
-
             ],
           ),
         ),
-
+        if (_videoController.value.isInitialized)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: AspectRatio(
+                  aspectRatio: _videoController.value.aspectRatio,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: VideoPlayer(_videoController),
+                  ),
+                ),
+              ),
         // Featured Products Section
         Padding(
           padding: const EdgeInsets.all(16.0),
