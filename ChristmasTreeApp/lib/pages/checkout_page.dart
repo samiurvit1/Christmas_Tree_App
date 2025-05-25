@@ -1,5 +1,7 @@
-import 'package:christmas_tree/pages/order_confirmation_page.dart'; //imported this page
+import 'package:christmas_tree/pages/order_confirmation_page.dart';
 import 'package:flutter/material.dart';
+import 'package:christmas_tree/models/cart.dart'; // <-- Import your cart
+import 'package:christmas_tree/models/product.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -20,6 +22,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = Cart();
+    final items = cart.items;
+
+    double subtotal = 0;
+    for (var item in items) {
+      subtotal += item.price;
+    }
+    double tax = subtotal * 0.09; // 9% tax
+    double total = subtotal + tax;
+    String subtotalStr = '\$${subtotal.toStringAsFixed(2)}';
+    String taxStr = '\$${tax.toStringAsFixed(2)}';
+    String totalStr = '\$${total.toStringAsFixed(2)}';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkout'),
@@ -170,56 +185,41 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildOrderItem('Christmas Tree', 1, 99.99),
-              _buildOrderItem('Ornament Set', 1, 29.99),
-              _buildOrderItem('Tree Stylist Service', 1, 65.00),
+
+              // Show cart items dynamically
+              if (items.isEmpty)
+                const Text('Your cart is empty!'),
+              ...items.map((product) => _buildOrderItem(product)).toList(),
+
               const Divider(height: 20, thickness: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Subtotal',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Text(
-                    '\$194.98',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                children: [
+                  const Text('Subtotal', style: TextStyle(fontSize: 16)),
+                  Text(subtotalStr, style: const TextStyle(fontSize: 16)),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  Text(
-                    'Shipping',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Text(
-                    'Free',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  Text('Shipping', style: TextStyle(fontSize: 16)),
+                  Text('Free', style: TextStyle(fontSize: 16)),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Tax',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Text(
-                    '\$17.55',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                children: [
+                  const Text('Tax', style: TextStyle(fontSize: 16)),
+                  Text(taxStr, style: const TextStyle(fontSize: 16)),
                 ],
               ),
               const Divider(height: 20, thickness: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     'Total',
                     style: TextStyle(
                       fontSize: 18,
@@ -227,8 +227,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ),
                   Text(
-                    '\$212.53',
-                    style: TextStyle(
+                    totalStr,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -270,18 +270,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  Widget _buildOrderItem(String name, int quantity, double price) {
+  Widget _buildOrderItem(Product product) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '$name x$quantity',
-            style: const TextStyle(fontSize: 16),
+          Expanded(
+            child: Text(
+              product.name,
+              style: const TextStyle(fontSize: 16),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           Text(
-            '\$${price.toStringAsFixed(2)}',
+            '\$${product.price.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 16),
           ),
         ],

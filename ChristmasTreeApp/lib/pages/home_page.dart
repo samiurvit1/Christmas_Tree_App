@@ -1,3 +1,4 @@
+import 'package:christmas_tree/models/cart.dart';
 import 'package:christmas_tree/pages/customize_tree_page.dart';
 import 'package:christmas_tree/pages/product_detail_page.dart';
 import 'package:christmas_tree/pages/refer_friend_page.dart';
@@ -11,6 +12,8 @@ import 'package:snow_fall_animation/snow_fall_animation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
+import 'package:christmas_tree/pages/checkout_page.dart';
+import 'package:christmas_tree/pages/cart_page.dart';
 
 import '../models/category.dart';
 // import '../services/api_service.dart'; // Import your ApiService
@@ -172,8 +175,11 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.shopping_bag_rounded),
             onPressed: () {
-              // Navigate to cart
-            },
+            Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CartPage()),
+          );
+          },
           ),
         ],
       ),
@@ -539,6 +545,23 @@ IconData getCupertinoIcon(String iconName) {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add_shopping_cart),
+                  label: const Text('Add to Cart'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF007F5F),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 36),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                  ),
+                  onPressed: () {
+                    Cart().add(product);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Added to cart!')),
+                    );
+                  },
+                ),
                 ],
               ),
             ),
