@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../models/category.dart';
 import '../services/api_service.dart';
+import '../models/cart.dart'; // <-- Import the cart
 
 class ShopPage extends StatefulWidget {
   final Category? category; // Make category nullable
@@ -20,12 +21,12 @@ class _ShopPageState extends State<ShopPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category?.name ?? 'Shop'), // Use category name if available, otherwise "Shop"
+        title: Text(widget.category?.name ?? 'Shop'),
       ),
       body: FutureBuilder<List<Product>>(
         future: widget.category != null
             ? _apiService.getProductsByCategory(widget.category!.categoryId)
-            : _apiService.getProducts(), // Fetch all products if no category is provided
+            : _apiService.getProducts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -88,6 +89,25 @@ class _ShopPageState extends State<ShopPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text('\$${product.price.toStringAsFixed(2)}'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.add_shopping_cart),
+                label: const Text('Add to Cart'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F5F),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 36),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                ),
+                onPressed: () {
+                  Cart().add(product);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Added to cart!')),
+                  );
+                },
+              ),
             ),
           ],
         ),
