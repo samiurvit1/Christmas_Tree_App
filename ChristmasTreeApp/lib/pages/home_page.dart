@@ -654,22 +654,22 @@ IconData getCupertinoIcon(String iconName) {
               },
             ),
           ),
-          const SizedBox(height: 16),
-          // Sign Out Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F5F),
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              onPressed: () {
-                // Logout logic
-              },
-              child: Text(t('sign_out')),
-            ),
-          ),
+          // const SizedBox(height: 16),
+          // // Sign Out Button
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          //   child: ElevatedButton(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: const Color(0xFF007F5F),
+          //       foregroundColor: Colors.white,
+          //       minimumSize: const Size(double.infinity, 50),
+          //     ),
+          //     onPressed: () {
+          //       // Logout logic
+          //     },
+          //     child: Text(t('sign_out')),
+          //   ),
+          // ),
         ],
       ),
     );

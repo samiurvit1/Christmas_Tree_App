@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
-import 'package:flutter_cube/flutter_cube.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart'; 
+import 'package:flutter_cube/flutter_cube.dart'; 
+import 'package:christmas_tree/pages/tree_stylist_page.dart'; // <-- Import TreeStylistPage
+import '../models/product.dart'; // Ensure Product model is imported
+import '../models/cart.dart';   // Ensure Cart model is imported
 
 class CustomizeTreePage extends StatefulWidget {
   const CustomizeTreePage({super.key});
@@ -50,6 +53,7 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
   Offset? draggedOrnamentPosition;
   String? draggedOrnamentType;
 
+  // Assume these are the options available for tree type
   final List<String> treeTypes = ['Natural', 'Artificial', 'Eco-Friendly'];
   final List<String> sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
   final List<String> colors = ['Green', 'White', 'Black', 'Pink', 'Gold'];
@@ -542,15 +546,81 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
   }
 
   void _saveDesign() {
+    // 1. Gather all customization details and create a description
+    String description = 'Customized Christmas Tree:\n'
+        '--------------------------\n'
+        '- Tree Type: $selectedTreeType\n'
+        '- Size: $selectedSize\n'
+        '- Tree Color: $selectedColor\n'
+        '- Topper: $selectedTreeTopper\n';
+
+    if (selectedLights.isNotEmpty) {
+      description += '- Lights: ${selectedLights.join(', ')}\n';
+    } else {
+      description += '- Lights: None\n';
+    }
+
+    if (placedOrnaments.isNotEmpty) {
+      Map<String, int> ornamentCounts = {};
+      for (var ornament in placedOrnaments) {
+        ornamentCounts[ornament.type] = (ornamentCounts[ornament.type] ?? 0) + 1;
+      }
+      String ornamentsSummary = ornamentCounts.entries
+          .map((entry) => '${entry.value}x ${entry.key}')
+          .join(', ');
+      description += '- Ornaments: $ornamentsSummary\n';
+    } else {
+      description += '- Ornaments: None\n';
+    }
+    description += '--------------------------';
+
+    // 2. Determine Price
+    double customTreePrice = 199.99; // Example price
+
+    // 3. Determine other Product fields
+    // For custom designs, we might use placeholder or specific values
+    int customProductId = DateTime.now().millisecondsSinceEpoch; // Unique ID as int
+    int customCategoryId = 0; // Example: 0 for 'Custom Designs' category
+    String customCategoryName = 'Custom Designs';
+    // Check if the selected tree type is 'Eco-Friendly'
+    bool isEco = selectedTreeType == 'Eco-Friendly';
+    int stockQty = 1; // A custom designed tree is unique, so stock is 1
+
+    // 4. Create a Product object for the custom tree
+    final Product customTreeProduct = Product(
+      productId: customProductId,
+      categoryId: customCategoryId,
+      categoryName: customCategoryName,
+      name: 'My Custom Designed Tree',
+      description: description,
+      price: customTreePrice,
+      imageUrl: 'assets/images/tree.png', // Main tree image as placeholder
+      isEcoFriendly: isEco,
+      stockQuantity: stockQty,
+    );
+
+    // 5. Add to Cart
+    Cart().add(customTreeProduct);
+
+    // 6. Show SnackBar feedback
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Design saved!')),
+      const SnackBar(
+        content: Text('Custom tree design added to cart!'),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 
   void _bookDesign() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Booking requested!')),
+    // Navigate to TreeStylistPage
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TreeStylistPage()),
     );
+    // Optionally, you can still show a SnackBar or remove it if navigation is enough
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   const SnackBar(content: Text('Proceeding to schedule service...')),
+    // );
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
+import '../models/cart.dart'; // <-- Import the Cart model
 
 class ProductDetailPage extends StatelessWidget {
   final Product product;
@@ -107,7 +108,10 @@ class ProductDetailPage extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
-                        // Add to cart
+                        Cart().add(product); // Add product to cart
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Added to cart!')),
+                        );
                       },
                       child: const Text(
                         'Add to Cart',
