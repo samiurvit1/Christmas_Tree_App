@@ -27,8 +27,29 @@ class _CartPageState extends State<CartPage> {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 final product = items[index];
+                Widget imageWidget;
+                if (product.imageUrl.startsWith('http')) {
+                  imageWidget = Image.network(
+                    product.imageUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image, size: 50), // Placeholder for network errors
+                  );
+                } else {
+                  imageWidget = Image.asset(
+                    product.imageUrl,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.image_not_supported, size: 50), // Placeholder for asset errors
+                  );
+                }
+
                 return ListTile(
-                  leading: Image.network(product.imageUrl, width: 50, height: 50, fit: BoxFit.cover),
+                  leading: imageWidget,
                   title: Text(product.name),
                   subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
                   trailing: IconButton(
