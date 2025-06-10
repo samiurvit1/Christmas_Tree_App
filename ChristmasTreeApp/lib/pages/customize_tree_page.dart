@@ -54,7 +54,7 @@ class _CustomizeTreePageState extends State<CustomizeTreePage>
   String? draggedOrnamentType;
 
   // Assume these are the options available for tree type
-  final List<String> treeTypes = ['Natural', 'Artificial', 'Eco-Friendly'];
+  final List<String> treeTypes = ['Natural', 'Artificial'];
   final List<String> sizes = ['Small', 'Medium', 'Large', 'Extra Large'];
   final List<String> colors = ['Green', 'White', 'Black', 'Pink', 'Gold'];
   final List<String> ornaments = [
