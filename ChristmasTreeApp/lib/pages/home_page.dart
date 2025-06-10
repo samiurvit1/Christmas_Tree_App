@@ -60,6 +60,8 @@ class _HomePageState extends State<HomePage> {
       'sign_out': 'Sign Out',
       'language': 'Español',
       'design_tree': 'Design Your Dream Tree',
+      'currency_symbol': '\$', // Add Dollar symbol for English
+
     },
     'es': {
       'christmas_decor': 'Decoración Navideña',
@@ -80,6 +82,8 @@ class _HomePageState extends State<HomePage> {
       'sign_out': 'Cerrar Sesión',
       'language': 'English',
       'design_tree': 'Diseña tu Árbol Soñado',
+      'currency_symbol': '€', // Add Euro symbol for Spanish
+
     }
   };
 
@@ -557,7 +561,7 @@ IconData getCupertinoIcon(String iconName) {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '\$${product.price.toStringAsFixed(2)}',
+                    '${t('currency_symbol')}${product.price.toStringAsFixed(2)}', // Use localized currency symbol
                     style: TextStyle(
                       color: const Color(0xFFD62828), // Festive Red
                       fontWeight: FontWeight.bold,
